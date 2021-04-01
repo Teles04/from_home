@@ -1,6 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
 
 from advertisements.models import Advertisement
 from advertisements.serializers import AdvertisementSerializer
@@ -23,3 +25,10 @@ class AdvertisementViewSet(ModelViewSet):
         if self.action in ["create", "update", "partial_update"]:
             return [IsAuthenticated()]
         return []
+
+    def destroy(self, request, *args, **kwargs):
+        if self.action in ["delete"]:
+            return [IsAuthenticated()]
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
